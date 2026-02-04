@@ -10,14 +10,13 @@ DB_SISTEMAS = "sistemas_taxbase.json"
 DB_USUARIOS = "usuarios_taxbase.json"
 
 # --- CREDENCIAIS PADRÃO DO ADM MASTER ---
-# Lembrete: Se já rodou o script antes, apague 'usuarios_taxbase.json' para resetar a senha.
 ADM_EMAIL = "admin@taxbase.com.br"
 ADM_SENHA_PADRAO = "Taxbase2025"
 
 # --- CONFIGURAÇÃO DA PÁGINA ---
 st.set_page_config(page_title="Taxbase Hub", page_icon="🔷", layout="wide")
 
-# --- CSS CUSTOMIZADO (VISUAL) ---
+# --- CSS CUSTOMIZADO (VISUAL + FORÇAR TEMA CLARO) ---
 st.markdown("""
     <style>
     /* 1. Remover itens padrão do Streamlit */
@@ -34,13 +33,23 @@ st.markdown("""
         --bg-color: #F8F9FA; 
         --border-color-padrao: #E0E0E0;
     }
-    .stApp { background-color: var(--bg-color); }
-    h1, h2, h3, h4, h5 { color: var(--taxbase-dark) !important; }
 
-    /* 3. Estilo dos Botões de Ação */
+    /* 3. FORÇAR TEMA CLARO (BLINDAGEM) */
+    /* Garante fundo claro e texto escuro mesmo se o PC estiver em Dark Mode */
+    .stApp { 
+        background-color: var(--bg-color); 
+        color: var(--taxbase-dark);
+    }
+
+    /* Força textos genéricos a serem escuros */
+    p, label, h1, h2, h3, h4, h5, li, span {
+        color: var(--taxbase-dark);
+    }
+
+    /* 4. Estilo dos Botões de Ação */
     div.stButton > button {
         background-color: var(--taxbase-blue);
-        color: white; 
+        color: white !important; /* Força branco no texto do botão */
         border-radius: 10px; 
         border: none;
         white-space: pre-wrap !important; 
@@ -51,11 +60,11 @@ st.markdown("""
     }
     div.stButton > button:hover { 
         background-color: #007CA3; 
-        color: white; 
+        color: white !important;
         transform: scale(1.02);
     }
 
-    /* 4. Estilo dos Cartões */
+    /* 5. Estilo dos Cartões */
     [data-testid="stVerticalBlock"] > [style*="flex-direction: column;"] > [data-testid="stVerticalBlock"] {
         background-color: white; 
         padding: 1.2rem; 
@@ -64,22 +73,23 @@ st.markdown("""
         border: 1px solid var(--border-color-padrao);
     }
 
-    /* 5. CORREÇÃO DEFINITIVA DA BORDA DOS CAMPOS DE TEXTO */
-    /* Altera a cor do cursor */
-    input, textarea {
+    /* 6. INPUTS E CAMPOS DE TEXTO (CORREÇÃO DE CORES) */
+    /* Força fundo branco nos inputs para evitar cinza do dark mode */
+    input, textarea, select {
+        background-color: white !important;
+        color: var(--taxbase-dark) !important;
         caret-color: var(--taxbase-blue) !important;
     }
-    /* Mira o contêiner principal do input e força a cor da borda */
+
+    /* Borda e Foco Azul Taxbase */
     div[data-baseweb="base-input"] {
+        background-color: white !important;
         border-color: var(--border-color-padrao) !important;
-        transition: all 0.2s !important;
     }
-    /* Quando o campo está em foco (clicado) ou com o mouse em cima */
     div[data-baseweb="base-input"]:focus-within,
     div[data-baseweb="base-input"]:hover {
         border-color: var(--taxbase-blue) !important;
-        box-shadow: 0 0 0 1px var(--taxbase-blue) !important; /* Cria um brilho azul */
-        outline: none !important;
+        box-shadow: 0 0 0 1px var(--taxbase-blue) !important;
     }
     </style>
     """, unsafe_allow_html=True)
