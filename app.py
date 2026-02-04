@@ -87,7 +87,7 @@ st.markdown("""
         box-shadow: 0 0 0 1px var(--taxbase-blue) !important;
     }
 
-    /* Centralizar imagens */
+    /* Centralizar imagens globalmente */
     [data-testid="stImage"] {
         display: flex;
         justify-content: center;
@@ -100,7 +100,6 @@ st.markdown("""
 def hash_senha(senha):
     return hashlib.sha256(senha.encode()).hexdigest()
 
-
 def carregar_json(arquivo):
     if not os.path.exists(arquivo): return []
     try:
@@ -109,11 +108,9 @@ def carregar_json(arquivo):
     except:
         return []
 
-
 def salvar_json(arquivo, dados):
     with open(arquivo, "w", encoding="utf-8") as f:
         json.dump(dados, f, indent=4, ensure_ascii=False)
-
 
 # --- VERIFICAÇÃO INICIAL (CRIAR ADMIN) ---
 if not os.path.exists(DB_USUARIOS) or not carregar_json(DB_USUARIOS):
@@ -133,7 +130,6 @@ def verificar_login(email, senha):
             return True
     return False
 
-
 def criar_novo_usuario(email, senha):
     usuarios = carregar_json(DB_USUARIOS)
     if any(u['email'] == email for u in usuarios):
@@ -142,7 +138,6 @@ def criar_novo_usuario(email, senha):
     salvar_json(DB_USUARIOS, usuarios)
     return True, "Usuário criado com sucesso!"
 
-
 @st.cache_data(ttl=60)
 def check_ping(url):
     try:
@@ -150,7 +145,6 @@ def check_ping(url):
         return True if r.status_code == 200 else False
     except:
         return False
-
 
 def obter_status_sistema(sistema):
     modo = sistema.get("status_manual", "Automático")
@@ -181,6 +175,7 @@ if not st.session_state['logado']:
         with st.container(border=True):
 
             # --- ÁREA DE LOGO LOGIN ---
+            # Usando colunas para ajustar a proporção no card de login
             l_vazio_esq, l_meio_conteudo, l_vazio_dir = st.columns([0.5, 4, 0.5])
 
             with l_meio_conteudo:
@@ -290,17 +285,17 @@ def abrir_painel_gestao():
 
 
 # ==============================================================================
-# TELA PRINCIPAL (MODIFICADA: LOGO GRANDE NO TOPO)
+# TELA PRINCIPAL (LOGADA)
 # ==============================================================================
 
 # 1. LOGO GIGANTE CENTRALIZADA NO TOPO
-col_vazio_l, col_logo_centro, col_vazio_r = st.columns([1, 2, 1])
-
-with col_logo_centro:
+# Usamos st.container sem colunas para permitir que o CSS centralize a imagem
+# e ela ocupe o tamanho real (400px) sem ser espremida.
+with st.container():
     if os.path.exists("logo_taxbase.png"):
-        # Logo bem grande (400px ou maior se preferir)
         st.image("logo_taxbase.png", width=400)
     else:
+        # Título simples se a logo não existir
         st.title("🟦 Taxbase")
 
 # 2. BOTÕES E BOAS VINDAS ABAIXO DA LOGO
