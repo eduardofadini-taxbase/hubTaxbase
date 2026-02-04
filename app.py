@@ -4,6 +4,7 @@ import json
 import os
 import hashlib
 import time
+import base64  # IMPORTANTE: Necessário para a logo centralizada via HTML
 
 # --- ARQUIVOS DE DADOS (BANCO DE DADOS JSON) ---
 DB_SISTEMAS = "sistemas_taxbase.json"
@@ -16,7 +17,7 @@ ADM_SENHA_PADRAO = "Taxbase2025"
 # --- CONFIGURAÇÃO DA PÁGINA ---
 st.set_page_config(page_title="Taxbase Hub", page_icon="🔷", layout="wide")
 
-# --- CSS CUSTOMIZADO (VISUAL + FORÇAR TEMA CLARO) ---
+# --- CSS CUSTOMIZADO (VISUAL + FORÇAR TEMA CLARO + AJUSTE DE MARGENS) ---
 st.markdown("""
     <style>
     /* 1. Remover itens padrão do Streamlit */
@@ -41,6 +42,17 @@ st.markdown("""
     }
     p, label, h1, h2, h3, h4, h5, li, span {
         color: var(--taxbase-dark);
+    }
+
+    /* AJUSTE FINO DE MARGENS GLOBAIS */
+    /* Reduz o espaço padrão no topo da aplicação */
+    .stMainBlockContainer {
+        padding-top: 2rem !important;
+    }
+    /* Reduz a margem padrão do st.divider (linha horizontal) */
+    hr {
+        margin-top: 0.5rem !important;
+        margin-bottom: 1.5rem !important;
     }
 
     /* 4. Estilo dos Botões de Ação */
@@ -87,7 +99,7 @@ st.markdown("""
         box-shadow: 0 0 0 1px var(--taxbase-blue) !important;
     }
 
-    /* Centralizar imagens globalmente */
+    /* Centralizar imagens (Geral) */
     [data-testid="stImage"] {
         display: flex;
         justify-content: center;
@@ -100,6 +112,7 @@ st.markdown("""
 def hash_senha(senha):
     return hashlib.sha256(senha.encode()).hexdigest()
 
+
 def carregar_json(arquivo):
     if not os.path.exists(arquivo): return []
     try:
@@ -108,9 +121,11 @@ def carregar_json(arquivo):
     except:
         return []
 
+
 def salvar_json(arquivo, dados):
     with open(arquivo, "w", encoding="utf-8") as f:
         json.dump(dados, f, indent=4, ensure_ascii=False)
+
 
 # --- VERIFICAÇÃO INICIAL (CRIAR ADMIN) ---
 if not os.path.exists(DB_USUARIOS) or not carregar_json(DB_USUARIOS):
@@ -130,6 +145,7 @@ def verificar_login(email, senha):
             return True
     return False
 
+
 def criar_novo_usuario(email, senha):
     usuarios = carregar_json(DB_USUARIOS)
     if any(u['email'] == email for u in usuarios):
@@ -138,6 +154,7 @@ def criar_novo_usuario(email, senha):
     salvar_json(DB_USUARIOS, usuarios)
     return True, "Usuário criado com sucesso!"
 
+
 @st.cache_data(ttl=60)
 def check_ping(url):
     try:
@@ -145,6 +162,7 @@ def check_ping(url):
         return True if r.status_code == 200 else False
     except:
         return False
+
 
 def obter_status_sistema(sistema):
     modo = sistema.get("status_manual", "Automático")
@@ -175,7 +193,6 @@ if not st.session_state['logado']:
         with st.container(border=True):
 
             # --- ÁREA DE LOGO LOGIN ---
-            # Usando colunas para ajustar a proporção no card de login
             l_vazio_esq, l_meio_conteudo, l_vazio_dir = st.columns([0.5, 4, 0.5])
 
             with l_meio_conteudo:
@@ -285,24 +302,32 @@ def abrir_painel_gestao():
 
 
 # ==============================================================================
-# TELA PRINCIPAL (LOGADA)
+# TELA PRINCIPAL (LOGADA) - COM AJUSTE FINO DE MARGENS
 # ==============================================================================
 
-# 1. LOGO GIGANTE CENTRALIZADA NO TOPO
-# Usamos st.container sem colunas para permitir que o CSS centralize a imagem
-# e ela ocupe o tamanho real (400px) sem ser espremida.
-with st.container():
-    if os.path.exists("logo_taxbase.png"):
-        st.image("logo_taxbase.png", width=400)
-    else:
-        # Título simples se a logo não existir
-        st.title("🟦 Taxbase")
+# 1. LOGO GIGANTE CENTRALIZADA E COM MARGENS CONTROLADAS VIA HTML
+if os.path.exists("logo_taxbase.png"):
+    with open("logo_taxbase.png", "rb") as f:
+        img_data = base64.b64encode(f.read()).decode()
+
+    # HTML para controle total de centralização e margens (Topo e Baixo)
+    st.markdown(
+        f"""
+        <div style="display: flex; justify-content: center; margin-top: -40px; margin-bottom: 10px;">
+            <img src="data:image/png;base64,{img_data}" width="400" style="max-width: 90%;">
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
+else:
+    st.title("🟦 Taxbase")
 
 # 2. BOTÕES E BOAS VINDAS ABAIXO DA LOGO
 col_texto, col_botoes = st.columns([4, 1.5])
 
 with col_texto:
-    st.markdown(f"### Hub Corporativo")
+    # Usando HTML para reduzir margem do título também
+    st.markdown("<h3 style='margin-bottom: 0px;'>Hub Corporativo</h3>", unsafe_allow_html=True)
     st.markdown(f"<span style='color: gray'>Bem-vindo, {usuario_atual}</span>", unsafe_allow_html=True)
 
 with col_botoes:
@@ -316,6 +341,7 @@ with col_botoes:
             st.session_state['usuario_atual'] = ""
             st.rerun()
 
+# O divisor agora tem menos margem devido ao CSS global adicionado no início
 st.divider()
 
 # --- FILTRO E LISTAGEM ---
