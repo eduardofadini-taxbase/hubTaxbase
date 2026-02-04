@@ -35,13 +35,10 @@ st.markdown("""
     }
 
     /* 3. FORÇAR TEMA CLARO (BLINDAGEM) */
-    /* Garante fundo claro e texto escuro mesmo se o PC estiver em Dark Mode */
     .stApp { 
         background-color: var(--bg-color); 
         color: var(--taxbase-dark);
     }
-
-    /* Força textos genéricos a serem escuros */
     p, label, h1, h2, h3, h4, h5, li, span {
         color: var(--taxbase-dark);
     }
@@ -49,7 +46,7 @@ st.markdown("""
     /* 4. Estilo dos Botões de Ação */
     div.stButton > button {
         background-color: var(--taxbase-blue);
-        color: white !important; /* Força branco no texto do botão */
+        color: white !important; 
         border-radius: 10px; 
         border: none;
         white-space: pre-wrap !important; 
@@ -73,15 +70,13 @@ st.markdown("""
         border: 1px solid var(--border-color-padrao);
     }
 
-    /* 6. INPUTS E CAMPOS DE TEXTO (CORREÇÃO DE CORES) */
-    /* Força fundo branco nos inputs para evitar cinza do dark mode */
+    /* 6. INPUTS E CAMPOS DE TEXTO */
     input, textarea, select {
         background-color: white !important;
         color: var(--taxbase-dark) !important;
         caret-color: var(--taxbase-blue) !important;
     }
 
-    /* Borda e Foco Azul Taxbase */
     div[data-baseweb="base-input"] {
         background-color: white !important;
         border-color: var(--border-color-padrao) !important;
@@ -90,6 +85,12 @@ st.markdown("""
     div[data-baseweb="base-input"]:hover {
         border-color: var(--taxbase-blue) !important;
         box-shadow: 0 0 0 1px var(--taxbase-blue) !important;
+    }
+
+    /* Centralizar imagens */
+    [data-testid="stImage"] {
+        display: flex;
+        justify-content: center;
     }
     </style>
     """, unsafe_allow_html=True)
@@ -114,7 +115,7 @@ def salvar_json(arquivo, dados):
         json.dump(dados, f, indent=4, ensure_ascii=False)
 
 
-# --- VERIFICAÇÃO INICIAL (CRIAR ADMIN SE NÃO EXISTIR) ---
+# --- VERIFICAÇÃO INICIAL (CRIAR ADMIN) ---
 if not os.path.exists(DB_USUARIOS) or not carregar_json(DB_USUARIOS):
     usuarios_iniciais = [{
         "email": ADM_EMAIL,
@@ -178,12 +179,18 @@ if not st.session_state['logado']:
         st.write("")
         st.write("")
         with st.container(border=True):
-            try:
-                st.image("Sem-nome-172-x-50-px-1.png", width=200)
-            except:
-                st.markdown("## 🔷 Taxbase Hub")
 
-            st.markdown("##### Acesso Restrito")
+            # --- ÁREA DE LOGO LOGIN ---
+            l_vazio_esq, l_meio_conteudo, l_vazio_dir = st.columns([0.5, 4, 0.5])
+
+            with l_meio_conteudo:
+                nome_arquivo_logo = "logo_taxbase.png"
+                if os.path.exists(nome_arquivo_logo):
+                    st.image(nome_arquivo_logo, width=300)
+                else:
+                    st.markdown("## 🔷 Taxbase Hub")
+                    st.caption("Sem logo")
+            # --------------------
 
             email_login = st.text_input("E-mail corporativo")
             senha_login = st.text_input("Senha", type="password")
@@ -282,18 +289,26 @@ def abrir_painel_gestao():
                         st.error(msg)
 
 
-# --- TELA PRINCIPAL ---
-col_logo, col_titulo, col_botoes = st.columns([1, 3, 1.5])
+# ==============================================================================
+# TELA PRINCIPAL (MODIFICADA: LOGO GRANDE NO TOPO)
+# ==============================================================================
 
-with col_logo:
-    try:
-        st.image("Sem-nome-172-x-50-px-1.png", width=160)
-    except:
-        st.write("🟦 Taxbase")
+# 1. LOGO GIGANTE CENTRALIZADA NO TOPO
+col_vazio_l, col_logo_centro, col_vazio_r = st.columns([1, 2, 1])
 
-with col_titulo:
-    st.markdown("### Hub Corporativo")
-    st.markdown(f"<small style='color:gray'>Logado como: {usuario_atual}</small>", unsafe_allow_html=True)
+with col_logo_centro:
+    if os.path.exists("logo_taxbase.png"):
+        # Logo bem grande (400px ou maior se preferir)
+        st.image("logo_taxbase.png", width=400)
+    else:
+        st.title("🟦 Taxbase")
+
+# 2. BOTÕES E BOAS VINDAS ABAIXO DA LOGO
+col_texto, col_botoes = st.columns([4, 1.5])
+
+with col_texto:
+    st.markdown(f"### Hub Corporativo")
+    st.markdown(f"<span style='color: gray'>Bem-vindo, {usuario_atual}</span>", unsafe_allow_html=True)
 
 with col_botoes:
     b1, b2 = st.columns(2)
