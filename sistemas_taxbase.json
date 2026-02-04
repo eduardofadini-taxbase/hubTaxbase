@@ -1,0 +1,23 @@
+[
+    {
+        "nome": "TaxbaseAI",
+        "url": "https://taxbase-ai-37356063443.us-east1.run.app",
+        "categoria": "Contábil",
+        "desc": "IA Contábil",
+        "status_manual": "Automático"
+    },
+    {
+        "nome": "Auditor Fiscal",
+        "url": "https://auditor-app-949447762420.us-central1.run.app/",
+        "categoria": "Fiscal",
+        "desc": "Auditor Fiscal",
+        "status_manual": "Manutenção"
+    },
+    {
+        "nome": "Métricas Onvio",
+        "url": "https://metricasonvio.streamlit.app/",
+        "categoria": "Gestão",
+        "desc": "Métricas do Messenger",
+        "status_manual": "Automático"
+    }
+]
